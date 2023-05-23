@@ -23,10 +23,17 @@ int **initializeGraph(int numOfNodes)
     return graph;
 }
 
-void fillGraph(int **graph, int src, int dst, int cost)
+void fillGraph(int **graph, FILE *topologyfile)
 {
-    graph[src][dst] = cost;
-    graph[dst][src] = cost;
+    while (!feof(topologyfile))
+    {
+        int src = 0;
+        int dst = 0;
+        int cost = 0;
+        fscanf(topologyfile, "%d %d %d", &src, &dst, &cost);
+        graph[src][dst] = cost;
+        graph[dst][src] = cost;
+    }
 }
 
 void freeGraph(int **graph, int numOfNodes)
@@ -159,11 +166,11 @@ void messageTransmission(FILE *outputfile, FILE *messagesfile, int ***routingTab
     {
         fprintf(outputfile, "from %d to %d cost %d hops ", src, dst, routingTable[src][dst][2]);
         fprintf(outputfile, "%d ", src);
-        int nextHop = routingTable[src][dst][1];
-        while (nextHop != dst)
+        int next = routingTable[src][dst][1];
+        while (next != dst)
         {
-            fprintf(outputfile, "%d ", nextHop);
-            nextHop = routingTable[nextHop][dst][1];
+            fprintf(outputfile, "%d ", next);
+            next = routingTable[next][dst][1];
         }
         fprintf(outputfile, "message %s\n", message);
     }
@@ -205,14 +212,7 @@ int main(int argc, char *argv[])
     }
 
     // fill graph
-    while (!feof(topologyfile))
-    {
-        int src = 0;
-        int dst = 0;
-        int cost = 0;
-        fscanf(topologyfile, "%d %d %d", &src, &dst, &cost);
-        fillGraph(graph, src, dst, cost);
-    }
+    fillGraph(graph, topologyfile);
 
     // run dijkstra algorithm
     for (int i = 0; i < numOfNodes; i++)
@@ -225,6 +225,8 @@ int main(int argc, char *argv[])
 
     // message transmission simulation
     messageTransmission(outputfile, messagesfile, routingTable);
+
+    printf("hi");
 
     freeGraph(graph, numOfNodes);
     freeRoutingTable(routingTable, numOfNodes);
