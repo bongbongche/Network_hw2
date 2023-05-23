@@ -23,17 +23,17 @@ int **initializeGraph(int numOfNodes)
     return graph;
 }
 
-void fillGraph(int **graph, FILE *topologyfile)
+void fillGraph(int **graph, int src, int dst, int cost)
 {
-    while (!feof(topologyfile))
+    if (cost == -999)
     {
-        int src = 0;
-        int dst = 0;
-        int cost = 0;
-        fscanf(topologyfile, "%d %d %d", &src, &dst, &cost);
-        graph[src][dst] = cost;
-        graph[dst][src] = cost;
+        graph[src][dst] = 999;
+        graph[dst][src] = 999;
+        return;
     }
+
+    graph[src][dst] = cost;
+    graph[dst][src] = cost;
 }
 
 void freeGraph(int **graph, int numOfNodes)
@@ -174,6 +174,7 @@ void messageTransmission(FILE *outputfile, FILE *messagesfile, int ***routingTab
         }
         fprintf(outputfile, "message %s\n", message);
     }
+    fprintf(outputfile, "\n");
 }
 
 int main(int argc, char *argv[])
@@ -212,7 +213,16 @@ int main(int argc, char *argv[])
     }
 
     // fill graph
-    fillGraph(graph, topologyfile);
+    while (1)
+    {
+        int src = 0;
+        int dst = 0;
+        int cost = 0;
+        fscanf(topologyfile, "%d %d %d", &src, &dst, &cost);
+        if (feof(topologyfile))
+            break;
+        fillGraph(graph, src, dst, cost);
+    }
 
     // run dijkstra algorithm
     for (int i = 0; i < numOfNodes; i++)
@@ -226,7 +236,30 @@ int main(int argc, char *argv[])
     // message transmission simulation
     messageTransmission(outputfile, messagesfile, routingTable);
 
-    printf("hi");
+    // change path and cost
+    while (1)
+    {
+        int src = 0;
+        int dst = 0;
+        int cost = 0;
+        fscanf(changesfile, "%d %d %d", &src, &dst, &cost);
+        if (feof(changesfile))
+            break;
+        fillGraph(graph, src, dst, cost);
+
+        // run dijkstra algorithm
+        for (int i = 0; i < numOfNodes; i++)
+        {
+            dijkstra(graph, i, numOfNodes, routingTable[i]);
+        }
+
+        // write routing table to output file
+        writeRoutingTable(routingTable, numOfNodes, outputfile);
+
+        // message transmission simulation
+        fseek(messagesfile, 0, SEEK_SET);
+        messageTransmission(outputfile, messagesfile, routingTable);
+    }
 
     freeGraph(graph, numOfNodes);
     freeRoutingTable(routingTable, numOfNodes);
