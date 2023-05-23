@@ -149,6 +149,26 @@ void freeRoutingTable(int ***routingTable, int numOfNodes)
     free(routingTable);
 }
 
+// message transmission simulation
+void messageTransmission(FILE *outputfile, FILE *messagesfile, int ***routingTable)
+{
+    int src = 0;
+    int dst = 0;
+    char message[1000];
+    while (fscanf(messagesfile, "%d %d %[^\n]", &src, &dst, message) != EOF)
+    {
+        fprintf(outputfile, "from %d to %d cost %d hops ", src, dst, routingTable[src][dst][2]);
+        fprintf(outputfile, "%d ", src);
+        int nextHop = routingTable[src][dst][1];
+        while (nextHop != dst)
+        {
+            fprintf(outputfile, "%d ", nextHop);
+            nextHop = routingTable[nextHop][dst][1];
+        }
+        fprintf(outputfile, "message %s\n", message);
+    }
+}
+
 int main(int argc, char *argv[])
 {
     if (argc != 4)
@@ -194,6 +214,7 @@ int main(int argc, char *argv[])
         fillGraph(graph, src, dst, cost);
     }
 
+    // run dijkstra algorithm
     for (int i = 0; i < numOfNodes; i++)
     {
         dijkstra(graph, i, numOfNodes, routingTable[i]);
@@ -201,6 +222,9 @@ int main(int argc, char *argv[])
 
     // write routing table to output file
     writeRoutingTable(routingTable, numOfNodes, outputfile);
+
+    // message transmission simulation
+    messageTransmission(outputfile, messagesfile, routingTable);
 
     freeGraph(graph, numOfNodes);
     freeRoutingTable(routingTable, numOfNodes);

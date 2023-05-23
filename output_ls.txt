@@ -28,3 +28,5 @@
 3 3 1
 4 4 0
 
+from 1 to 0 cost 6 hops 1 4 3 message here is a message from 1 to 0
+from 2 to 4 cost 7 hops 2 1 message this one gets sent from 2 to 4!
