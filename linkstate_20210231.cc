@@ -164,6 +164,13 @@ void messageTransmission(FILE *outputfile, FILE *messagesfile, int ***routingTab
     char message[1000];
     while (fscanf(messagesfile, "%d %d %[^\n]", &src, &dst, message) != EOF)
     {
+        // when path does not exist
+        if (routingTable[src][dst][2] == 999)
+        {
+            fprintf(outputfile, "from %d to %d cost infinite hops unreachable message %s\n", src, dst, message);
+            continue;
+        }
+
         fprintf(outputfile, "from %d to %d cost %d hops ", src, dst, routingTable[src][dst][2]);
         fprintf(outputfile, "%d ", src);
         int next = routingTable[src][dst][1];
@@ -201,7 +208,7 @@ int main(int argc, char *argv[])
     fscanf(topologyfile, "%d", &numOfNodes);
     int **graph = initializeGraph(numOfNodes);
 
-    // routing tables. [0]: destination, [1]: next hop, [2]: cost
+    // routing tables. [0]: destination, [1]: next, [2]: cost
     int ***routingTable = (int ***)malloc(sizeof(int **) * numOfNodes);
     for (int i = 0; i < numOfNodes; i++)
     {
