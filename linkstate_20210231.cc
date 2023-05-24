@@ -136,6 +136,8 @@ void writeRoutingTable(int ***routingTable, int numOfNodes, FILE *outputfile)
     {
         for (int j = 0; j < numOfNodes; j++)
         {
+            if (routingTable[i][j][2] == 999)
+                continue;
             fprintf(outputfile, "%d %d %d\n", routingTable[i][j][0], routingTable[i][j][1], routingTable[i][j][2]);
         }
         fprintf(outputfile, "\n");
@@ -226,9 +228,9 @@ int main(int argc, char *argv[])
         int dst = 0;
         int cost = 0;
         fscanf(topologyfile, "%d %d %d", &src, &dst, &cost);
+        fillGraph(graph, src, dst, cost);
         if (feof(topologyfile))
             break;
-        fillGraph(graph, src, dst, cost);
     }
 
     // run dijkstra algorithm
@@ -240,7 +242,7 @@ int main(int argc, char *argv[])
     // write routing table to output file
     writeRoutingTable(routingTable, numOfNodes, outputfile);
 
-    // message transmission simulation
+    // message transmission simulation.
     messageTransmission(outputfile, messagesfile, routingTable);
 
     // change path and cost
