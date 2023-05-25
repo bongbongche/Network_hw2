@@ -85,7 +85,7 @@ void recordNextHop(int parent[], int src, int dst, int **routingTable)
     routingTable[dst][1] = routingTable[parent[dst]][1];
 }
 
-void dijkstra(int **graph, int src, int numOfNodes, int **routingTable)
+void linkState(int **graph, int src, int numOfNodes, int **routingTable)
 {
     int distance[numOfNodes];
     bool visited[numOfNodes];
@@ -233,10 +233,10 @@ int main(int argc, char *argv[])
             break;
     }
 
-    // run dijkstra algorithm
+    // run link state algorithm
     for (int i = 0; i < numOfNodes; i++)
     {
-        dijkstra(graph, i, numOfNodes, routingTable[i]);
+        linkState(graph, i, numOfNodes, routingTable[i]);
     }
 
     // write routing table to output file
@@ -256,10 +256,10 @@ int main(int argc, char *argv[])
             break;
         fillGraph(graph, src, dst, cost);
 
-        // run dijkstra algorithm
+        // run link state algorithm
         for (int i = 0; i < numOfNodes; i++)
         {
-            dijkstra(graph, i, numOfNodes, routingTable[i]);
+            linkState(graph, i, numOfNodes, routingTable[i]);
         }
 
         // write routing table to output file
@@ -275,6 +275,8 @@ int main(int argc, char *argv[])
     fclose(topologyfile);
     fclose(messagesfile);
     fclose(changesfile);
+
+    printf("Complete. Output file written to output_ls.txt.\n");
 
     return 0;
 }

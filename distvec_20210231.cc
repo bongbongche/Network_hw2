@@ -45,9 +45,9 @@ void freeGraph(int **graph, int numOfNodes)
     free(graph);
 }
 
-// bellman-ford algorithm
-void bellmanFord(int **graph, int numOfNodes, int ***routingTable)
+void distanceVector(int **graph, int numOfNodes, int ***routingTable)
 {
+    // first routing table
     for (int i = 0; i < numOfNodes; i++)
     {
         for (int j = 0; j < numOfNodes; j++)
@@ -185,7 +185,8 @@ int main(int argc, char *argv[])
             break;
     }
 
-    bellmanFord(graph, numOfNodes, routingTable);
+    // run distance vector algorithm
+    distanceVector(graph, numOfNodes, routingTable);
 
     // write routing table to output file
     writeRoutingTable(routingTable, numOfNodes, outputfile);
@@ -205,7 +206,7 @@ int main(int argc, char *argv[])
         fillGraph(graph, src, dst, cost);
 
         // run distance vector algorithm
-        bellmanFord(graph, numOfNodes, routingTable);
+        distanceVector(graph, numOfNodes, routingTable);
 
         // write routing table to output file
         writeRoutingTable(routingTable, numOfNodes, outputfile);
@@ -220,6 +221,8 @@ int main(int argc, char *argv[])
     fclose(topologyfile);
     fclose(messagesfile);
     fclose(changesfile);
+
+    printf("Complete. Output file written to output_dv.txt.\n");
 
     return 0;
 }
