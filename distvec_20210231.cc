@@ -153,7 +153,7 @@ int main(int argc, char *argv[])
 
     if (topologyfile == NULL || messagesfile == NULL || changesfile == NULL)
     {
-        fprintf(stderr, "Error: open file failed.");
+        fprintf(stderr, "Error: open input file.");
         exit(1);
     }
 
